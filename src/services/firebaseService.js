@@ -57,9 +57,11 @@ class FirebaseService {
   // --- ADD THIS NEW METHOD ---
   async logSyncOperation(operation, status, details) {
     try {
+      // Default status to 'unknown' if undefined
+      const safeStatus = status === undefined ? 'unknown' : status;
       await this.db.collection(this.collections.syncLogs).add({
         operation,
-        status,
+        status: safeStatus,
         details,
         timestamp: admin.firestore.FieldValue.serverTimestamp()
       });
