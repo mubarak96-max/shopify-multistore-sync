@@ -11,6 +11,8 @@ const logger = require('./utils/logger');
 const webhookRoutes = require('./controllers/webhookController');
 const syncRoutes = require('./controllers/syncController');
 const healthRoutes = require('./controllers/healthController');
+const syncController = require('./controllers/syncController');
+
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -47,6 +49,8 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use('/health', healthRoutes);
 app.use('/webhooks', webhookRoutes);
 app.use('/sync', syncRoutes);
+app.use('/api', syncController);
+
 
 // Error handling middleware
 app.use((err, req, res, next) => {
