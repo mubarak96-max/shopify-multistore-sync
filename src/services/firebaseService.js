@@ -6,7 +6,6 @@ const logger = require("../utils/logger");
 class FirebaseService {
   constructor() {
     if (!admin.apps.length) {
-      // Ensure all required environment variables are set
       const requiredEnvVars = [
         "FIREBASE_PROJECT_ID",
         "FIREBASE_PRIVATE_KEY_ID",
@@ -15,7 +14,6 @@ class FirebaseService {
         "FIREBASE_CLIENT_ID",
         "FIREBASE_AUTH_URI",
         "FIREBASE_TOKEN_URI",
-        // Add other fields if you need them, like auth_provider_x509_cert_url, client_x509_cert_url, universe_domain
       ];
 
       for (const envVar of requiredEnvVars) {
@@ -24,18 +22,19 @@ class FirebaseService {
         }
       }
 
-      // Construct the service account object from environment variables
+      let privateKey = process.env.FIREBASE_PRIVATE_KEY;
+      privateKey = privateKey.replace(/\n/g, "\n");
+      privateKey = privateKey.replace(/\\n/g, "\n");
+
       const serviceAccount = {
         type: "service_account",
         project_id: process.env.FIREBASE_PROJECT_ID,
         private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID,
-        // The private_key needs its newlines correctly interpreted
-        private_key: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n"),
+        private_key: privateKey,
         client_email: process.env.FIREBASE_CLIENT_EMAIL,
         client_id: process.env.FIREBASE_CLIENT_ID,
         auth_uri: process.env.FIREBASE_AUTH_URI,
         token_uri: process.env.FIREBASE_TOKEN_URI,
-        // Add these if you include them in your .env / Render envs
         auth_provider_x509_cert_url: process.env.FIREBASE_AUTH_PROVIDER_X509_CERT_URL || "https://www.googleapis.com/oauth2/v1/certs",
         client_x509_cert_url: process.env.FIREBASE_CLIENT_X509_CERT_URL || `https://www.googleapis.com/robot/v1/metadata/x509/${process.env.FIREBASE_CLIENT_EMAIL}`,
         universe_domain: process.env.FIREBASE_UNIVERSE_DOMAIN || "googleapis.com"
@@ -43,7 +42,7 @@ class FirebaseService {
 
       admin.initializeApp({
         credential: admin.credential.cert(serviceAccount ),
-        databaseURL: process.env.FIREBASE_DATABASE_URL, // Still use this if you have a Realtime Database URL
+        databaseURL: process.env.FIREBASE_DATABASE_URL,
       });
     }
 
@@ -51,11 +50,25 @@ class FirebaseService {
     this.collections = {
       products: "products",
       syncLogs: "sync_logs",
-      config: "config",
+      config: "config"
     };
   }
 
-  // ... rest of your class ...
+  // --- ADD THIS NEW METHOD ---
+  async logSyncOperation(operation, status, details) {
+    try {
+      await this.db.collection(this.collections.syncLogs).add({
+        operation,
+        status,
+        details,
+        timestamp: admin.firestore.FieldValue.serverTimestamp()
+      });
+    } catch (error) {
+      logger.error("Failed to log sync operation to Firebase:", error);
+    }
+  }
+
+  // ... (rest of your existing methods like getProductBySyncId, getAllProducts, saveProduct, etc.)
 }
 
 module.exports = FirebaseService;
