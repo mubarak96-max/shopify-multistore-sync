@@ -68,6 +68,31 @@ class FirebaseService {
     }
   }
 
+  /**
+   * Find a product mapping by store and product ID
+   * @param {string} store - 'storeA' or 'storeB'
+   * @param {string|number} productId - Shopify product ID
+   * @returns {Promise<object|null>} - Product mapping or null if not found
+   */
+  async getProductByStoreId(store, productId) {
+    try {
+      const query = await this.db
+        .collection(this.collections.products)
+        .where(`${store}_id`, "==", productId)
+        .limit(1)
+        .get();
+
+      if (query.empty) {
+        return null;
+      }
+      const doc = query.docs[0];
+      return { id: doc.id, ...doc.data() };
+    } catch (error) {
+      logger.error(`Failed to get product by store ID from Firebase:`, error);
+      return null;
+    }
+  }
+
   // ... (rest of your existing methods like getProductBySyncId, getAllProducts, saveProduct, etc.)
 }
 
