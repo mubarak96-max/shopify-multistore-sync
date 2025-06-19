@@ -2,3 +2,5 @@
 {"level":"info","message":"Environment: development","service":"shopify-sync","timestamp":"2025-06-19T11:52:41.351Z"}
 {"level":"info","message":"Shopify Sync Server running on port 3000","service":"shopify-sync","timestamp":"2025-06-19T12:03:32.405Z"}
 {"level":"info","message":"Environment: development","service":"shopify-sync","timestamp":"2025-06-19T12:03:32.410Z"}
+{"level":"info","message":"Shopify Sync Server running on port 3000","service":"shopify-sync","timestamp":"2025-06-19T12:13:21.144Z"}
+{"level":"info","message":"Environment: development","service":"shopify-sync","timestamp":"2025-06-19T12:13:21.149Z"}
